@@ -24,6 +24,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       return true;
     } catch (error) {
+      console.log(error);
       return logout();
     }
   };
@@ -31,9 +32,15 @@ export const useAuthStore = defineStore('auth', () => {
   const register = async (fullName: string, email: string, password: string) => {
     try {
       const response = await registerAction(fullName, email, password);
-      return response;
+
+      user.value = response.user;
+      token.value = response.token;
+      authStatus.value = response.Authenticated;
+
+      return { ok: true, message: '' };
     } catch (error) {
-      throw new Error(`Error ${error}`);
+      logout();
+      return { ok: false, message: 'Error al registrar el usuario' };
     }
   };
 
