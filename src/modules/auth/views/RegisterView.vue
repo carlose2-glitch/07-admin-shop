@@ -1,10 +1,12 @@
 <template>
-  <h1 class="text-2xl font-semibold mb-4">Register</h1>
-  <form action="#" method="POST">
+  <h1 class="text-2xl font-semibold mb-4">Nueva cuenta</h1>
+  <form @submit.prevent="Data">
     <!-- Username Input -->
     <div class="mb-4">
-      <label for="name" class="block text-gray-600">Name</label>
+      <label for="name" class="block text-gray-600">Nombre</label>
       <input
+        v-on:input="evaluateInputs"
+        v-model="myForm.name"
         type="text"
         id="name"
         name="name"
@@ -15,19 +17,23 @@
 
     <!-- Username Input -->
     <div class="mb-4">
-      <label for="username" class="block text-gray-600">Username</label>
+      <label for="username" class="block text-gray-600">Email</label>
       <input
-        type="text"
-        id="username"
-        name="username"
+        v-on:input="evaluateInputs"
+        v-model="myForm.email"
+        type="email"
+        id="email"
+        name="email"
         class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
         autocomplete="off"
       />
     </div>
     <!-- Password Input -->
     <div class="mb-4">
-      <label for="password" class="block text-gray-600">Password</label>
+      <label for="password" class="block text-gray-600">Contraseña</label>
       <input
+        v-on:input="evaluateInputs"
+        v-model="myForm.password"
         type="password"
         id="password"
         name="password"
@@ -35,25 +41,53 @@
         autocomplete="off"
       />
     </div>
-    <!-- Remember Me Checkbox -->
-    <div class="mb-4 flex items-center">
-      <input type="checkbox" id="remember" name="remember" class="text-blue-500" />
-      <label for="remember" class="text-gray-600 ml-2">Remember Me</label>
-    </div>
+
     <!-- Forgot Password Link -->
     <div class="mb-6 text-blue-500">
-      <a href="#" class="hover:underline">Forgot Password?</a>
+      <a href="#" class="hover:underline">Olvido la contraseña</a>
     </div>
     <!-- Login Button -->
     <button
+      v-bind:disabled="validateButtom"
       type="submit"
-      class="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"
+      class="bg-blue-500 disabled:bg-slate-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full"
     >
-      Login
+      Crear cuenta
     </button>
   </form>
   <!-- Sign up  Link -->
   <div class="mt-6 text-blue-500 text-center">
-    <RouterLink :to="{ name: 'login' }" class="hover:underline">Login Here</RouterLink>
+    <RouterLink :to="{ name: 'login' }" class="hover:underline">Ingresar por aqui</RouterLink>
   </div>
 </template>
+
+<script lang="ts" setup>
+import { reactive, ref } from 'vue';
+import { useAuthStore } from '../stores/auth.store';
+
+const authStore = useAuthStore();
+const validateButtom = ref<boolean>(true);
+
+const myForm = reactive({
+  name: '',
+  email: '',
+  password: '',
+});
+
+const evaluateInputs = () => {
+  if (myForm.name.trim() !== '' && myForm.email.trim() !== '' && myForm.password.trim() !== '') {
+    validateButtom.value = false;
+  } else {
+    validateButtom.value = true;
+  }
+};
+//esta funcion se ejecuta solo cuando el boton este habilitado
+const Data = async () => {
+  try {
+    const result = await authStore.register(myForm.name, myForm.email, myForm.password);
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+};
+</script>
