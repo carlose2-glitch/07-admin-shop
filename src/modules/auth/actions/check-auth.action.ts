@@ -1,5 +1,5 @@
 import { tesloApi } from '@/api/tesloApi';
-import type { User } from '../interfaces';
+import type { AuthResponse, User } from '../interfaces';
 import { isAxiosError } from 'axios';
 
 interface CheckError {
@@ -20,8 +20,8 @@ export const checkAuthAction = async (): Promise<CheckError | CheckSuccess> => {
       return { ok: false };
     }
 
-    const { data } = await tesloApi.get('/auth/check-status');
-    return { ok: true, user: data.data, token: data.token };
+    const { data } = await tesloApi.get<AuthResponse>('/auth/check-status');
+    return { ok: true, user: data.user, token: data.token };
   } catch (error) {
     if (isAxiosError(error) && error.response?.status === 401) {
       return {
